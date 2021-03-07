@@ -2,8 +2,11 @@ package payment
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/go-kit/kit/endpoint"
+
+	"github.com/maximdanilchenko/coins/wallet"
 )
 
 type Endpoints struct {
@@ -22,6 +25,9 @@ func makeCreatePaymentEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(CreatePaymentRequest)
 		err := s.CreatePayment(ctx, req.Payment)
+		if err != nil {
+			return nil, wallet.NewErrHttp(err.Error(), http.StatusBadRequest)
+		}
 		return nil, err
 	}
 }

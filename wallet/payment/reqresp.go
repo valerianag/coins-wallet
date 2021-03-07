@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+
+	"github.com/maximdanilchenko/coins/wallet"
 )
 
 type (
@@ -19,7 +21,7 @@ func decodeCreatePaymentReq(ctx context.Context, r *http.Request) (interface{}, 
 	var req CreatePaymentRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
-		return nil, err
+		return nil, wallet.NewErrHttp(err.Error(), http.StatusBadRequest)
 	}
 	return req, nil
 }
