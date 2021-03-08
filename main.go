@@ -19,7 +19,9 @@ import (
 	"github.com/maximdanilchenko/coins/wallet/payment"
 )
 
+// main function to configure and start server
 func main() {
+	// Create logger
 	var logger log.Logger
 	{
 		logger = log.NewLogfmtLogger(os.Stderr)
@@ -36,6 +38,7 @@ func main() {
 		return
 	}
 
+	// Create db connections
 	var db *sql.DB
 	{
 		var err error
@@ -48,8 +51,17 @@ func main() {
 
 	}
 
+	// Handle syscalls
+	errs := make(chan error)
+	go func() {
+		c := make(chan os.Signal, 1)
+		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
+		errs <- fmt.Errorf("%s", <-c)
+	}()
+
 	ctx := context.Background()
 
+	// Creat needed handlers from all services
 	var (
 		accountsService account.Service
 		paymentsService payment.Service
@@ -62,19 +74,13 @@ func main() {
 		paymentsService = payment.NewService(paymentsStorage, logger)
 	}
 
-	errs := make(chan error)
-	go func() {
-		c := make(chan os.Signal, 1)
-		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
-		errs <- fmt.Errorf("%s", <-c)
-	}()
-
 	accountsEndpoints := account.MakeEndpoints(accountsService)
 	paymentsEndpoints := payment.MakeEndpoints(paymentsService)
 
 	accountsHandler := account.MakeHttpHandlers(ctx, accountsEndpoints)
 	paymentsHandler := payment.MakeHttpHandlers(ctx, paymentsEndpoints)
 
+	// Run server
 	go func() {
 		fmt.Println("listening on port", config.AppPort)
 		sm := http.NewServeMux()

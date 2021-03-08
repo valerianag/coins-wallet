@@ -19,6 +19,7 @@ func NewService(storage Storage, logger log.Logger) Service {
 	}
 }
 
+// CreatePayment creates new payment
 func (s service) CreatePayment(ctx context.Context, payment Payment) error {
 	logger := log.With(s.logger, "method", "CreatePayment")
 
@@ -31,6 +32,7 @@ func (s service) CreatePayment(ctx context.Context, payment Payment) error {
 	return nil
 }
 
+// CreatePayment returns all existing payments
 func (s service) GetPayments(ctx context.Context) ([]Payment, error) {
 	logger := log.With(s.logger, "method", "GetPayments")
 

@@ -19,6 +19,7 @@ func NewService(storage Storage, logger log.Logger) Service {
 	}
 }
 
+// CreateAccount creates new account
 func (s service) CreateAccount(ctx context.Context, account Account) error {
 	logger := log.With(s.logger, "method", "CreateAccount")
 
@@ -31,6 +32,7 @@ func (s service) CreateAccount(ctx context.Context, account Account) error {
 	return nil
 }
 
+// GetAccounts returns all existing accounts
 func (s service) GetAccounts(ctx context.Context) ([]Account, error) {
 	logger := log.With(s.logger, "method", "GetAccounts")
 

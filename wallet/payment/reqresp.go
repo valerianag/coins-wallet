@@ -23,6 +23,7 @@ func decodeCreatePaymentReq(ctx context.Context, r *http.Request) (interface{}, 
 	if err != nil {
 		return nil, wallet.NewErrHttp(err.Error(), http.StatusBadRequest)
 	}
+	// Request data validation. TODO: move it to another middleware or use some validation instruments aka swagger etc
 	if !req.Payment.Amount.IsPositive() {
 		return nil, wallet.NewErrHttp("amount should be positive", http.StatusBadRequest)
 	}

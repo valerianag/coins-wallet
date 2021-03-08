@@ -5,6 +5,7 @@ type ErrHttp struct {
 	statusCode int
 }
 
+// NewErrHttp creates ErrHttp. We need it to be able to change response status codes
 func NewErrHttp(error string, statusCode int) ErrHttp {
 	return ErrHttp{
 		error:      error,

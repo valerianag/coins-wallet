@@ -32,6 +32,8 @@ func NewStorage(db *sql.DB, logger log.Logger) Storage {
 	}
 }
 
+// CreatePayment selects needed accounts in FOR UPDATE mode checks that from_account has needed balance
+// and that both has same currency. Then creates payment and updates both account balances in one transaction
 func (s storage) CreatePayment(ctx context.Context, payment Payment) error {
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
