@@ -177,7 +177,7 @@ Content-Type: text/plain; charset=utf-8
 Date: Mon, 08 Mar 2021 11:21:57 GMT
 Content-Length: 26
 
-should be 2 decimal places%       
+should be no more than 2 decimal places%     
 ```  
 
 Request                                                                                                                                                                     
