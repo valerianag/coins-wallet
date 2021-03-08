@@ -14,11 +14,10 @@ import (
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 
+	"github.com/maximdanilchenko/coins/wallet"
 	"github.com/maximdanilchenko/coins/wallet/account"
 	"github.com/maximdanilchenko/coins/wallet/payment"
 )
-
-const dbsource = "postgresql://postgres:postgres@localhost:5432/wallet_db?sslmode=disable"
 
 func main() {
 	var logger log.Logger
@@ -31,12 +30,17 @@ func main() {
 			"caller", log.DefaultCaller,
 		)
 	}
+	config, err := wallet.NewAppConfig()
+	if err != nil {
+		level.Error(logger).Log("config error", err)
+		return
+	}
 
 	var db *sql.DB
 	{
 		var err error
 
-		db, err = sql.Open("postgres", dbsource)
+		db, err = sql.Open("postgres", config.PostgresDSN)
 		if err != nil {
 			level.Error(logger).Log("exit", err)
 			os.Exit(-1)
@@ -68,15 +72,15 @@ func main() {
 	accountsEndpoints := account.MakeEndpoints(accountsService)
 	paymentsEndpoints := payment.MakeEndpoints(paymentsService)
 
-	accountsHandler := account.NewHTTPServer(ctx, accountsEndpoints)
-	paymentsHandler := payment.NewHTTPServer(ctx, paymentsEndpoints)
+	accountsHandler := account.MakeHttpHandlers(ctx, accountsEndpoints)
+	paymentsHandler := payment.MakeHttpHandlers(ctx, paymentsEndpoints)
 
 	go func() {
-		fmt.Println("listening on port", ":8080")
+		fmt.Println("listening on port", config.AppPort)
 		sm := http.NewServeMux()
 		sm.Handle("/accounts", accountsHandler)
 		sm.Handle("/payments", paymentsHandler)
-		errs <- http.ListenAndServe(":8080", sm)
+		errs <- http.ListenAndServe(config.AppPort, sm)
 	}()
 
 	level.Error(logger).Log("exit", <-errs)
