@@ -97,7 +97,9 @@ func queryAccountForUpdate(ctx context.Context, tx *sql.Tx, accountName string) 
 }
 
 func (s storage) GetPayments(ctx context.Context) ([]Payment, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT account_from, account_to, amount FROM payments`)
+	rows, err := s.db.QueryContext(ctx, `SELECT af.name, at.name, amount FROM payments p
+		JOIN accounts af on p.account_from = af.id
+		JOIN accounts at on p.account_to = at.id`)
 	if err != nil {
 		return nil, err
 	}
