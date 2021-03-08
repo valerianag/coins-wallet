@@ -11,3 +11,15 @@ run-pg-migrate:
 kill-pg:
 	docker stop coins-postgres
 	docker rm coins-postgres
+
+dev-up:
+	docker-compose up -d wallet-app-dev
+
+dev-env:
+	docker-compose up -d wallet-app-migrate
+
+dev-down:
+	docker-compose down --remove-orphans
+
+dev-clean:
+	docker-compose down -v --rmi all
