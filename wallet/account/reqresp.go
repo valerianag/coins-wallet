@@ -23,6 +23,18 @@ func decodeCreateAccountReq(ctx context.Context, r *http.Request) (interface{}, 
 	if err != nil {
 		return nil, wallet.NewErrHttp(err.Error(), http.StatusBadRequest)
 	}
+	if req.Account.Balance.IsNegative() {
+		return nil, wallet.NewErrHttp("amount should be positive", http.StatusBadRequest)
+	}
+	if req.Account.Balance.Exponent() != -2 {
+		return nil, wallet.NewErrHttp("should be 2 decimal places", http.StatusBadRequest)
+	}
+	if req.Account.Currency == "" {
+		return nil, wallet.NewErrHttp("currency should not be empty", http.StatusBadRequest)
+	}
+	if req.Account.Name == "" {
+		return nil, wallet.NewErrHttp("name should not be empty", http.StatusBadRequest)
+	}
 	return req, nil
 }
 
